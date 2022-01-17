@@ -1,27 +1,36 @@
-
 import logging
 import os
 from datetime import datetime
 
-# Create a folder for the logs
-try:
+
+def initialize_logger():
+    """Initialize custom logger settings, log folder and file structure."""
+    # Create a folder for the logs
     log_path = "./logs"
-    os.mkdir(log_path)
-except OSError:
-    print("Log directory already exists.")
-else:
-    print("Successfully created log directory.")
 
-# Create the log file for today
-log_file = datetime.now().strftime("%Y-%m-%d.log")
+    # Check for the Log directory, if not, attempt to make one
+    if not os.path.isdir(log_path):
 
-# Configure logger with file for today, format, minimum level logging.DEBUG
-logging.basicConfig(filename=log_path + "/" + log_file, format="%(asctime)s - %(levelname)s: %(message)s",
-                    level=logging.DEBUG)
+        try:
+            os.mkdir(log_path)
+        except OSError:
+            print("Failed to create log directory.")
+        else:
+            print("Successfully created log directory.")
 
-logging.getLogger().addHandler(logging.StreamHandler())
+    # Create the log file for today
+    date_format = datetime.now().strftime("%Y-%m-%d")
+    log_file_name = log_path + "/" + date_format + ".log"
 
-logging.info("Log initialized.")
+    file_exists = os.path.isfile(log_file_name)
 
+    # Configure logger with file for today, format, minimum level logging.DEBUG
+    logging.basicConfig(filename=log_file_name, format="%(asctime)s - %(levelname)s: %(message)s",
+                        level=logging.DEBUG)
 
+    logging.getLogger().addHandler(logging.StreamHandler())
 
+    if not file_exists:
+        logging.info("Log initialized.")
+    else:
+        logging.info("Logger re-initialized with existing log.")
